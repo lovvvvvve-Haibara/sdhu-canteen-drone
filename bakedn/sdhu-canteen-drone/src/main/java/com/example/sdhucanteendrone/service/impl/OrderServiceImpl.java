@@ -299,6 +299,7 @@ public class OrderServiceImpl implements OrderService {
         dto.setCustomerId(o.getCustomerId());
         dto.setCanteenId(o.getCanteenId());
         dto.setStatus(o.getStatus());
+        dto.setStatusLabel(o.getStatus().getLabel());
         dto.setDeliveryMethod(o.getDeliverMethod());
         dto.setAmountCent(o.getAmountTotal());
         dto.setDeliveryAddress(o.getAddress());
@@ -333,6 +334,7 @@ public class OrderServiceImpl implements OrderService {
         dto.setCustomerId(o.getCustomerId());
         dto.setCanteenId(o.getCanteenId());
         dto.setStatus(o.getStatus());
+        dto.setStatusLabel(o.getStatus().getLabel());
         dto.setDeliveryMethod(o.getDeliverMethod());
         dto.setAmountCent(o.getAmountTotal());
         dto.setDeliveryAddress(o.getAddress());

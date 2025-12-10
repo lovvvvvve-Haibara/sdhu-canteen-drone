@@ -28,7 +28,7 @@ public class OrderItem {
     @Column(name = "qty", nullable = false)
     private Integer quantity;
 
-    @Column(name = "subtotal")
+    @Column(name = "subtotal", insertable = false, updatable = false)
     private Integer subtotal;   // 若使用数据库生成列可保留
 
     @Column(name = "created_at", nullable = false, updatable = false)

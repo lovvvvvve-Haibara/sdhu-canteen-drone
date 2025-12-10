@@ -65,12 +65,13 @@ public class UserServiceImpl implements UserService {
                 userRepository.findByUsernameLc(usernameOrPhone)
                         .or(() -> userRepository.findByPhone(usernameOrPhone));
         System.out.println(usernameLc);
+        System.out.println(password);
         User user = optionalUser.orElseThrow(
-                () -> BizException.unauthorized("用户不存在或密码错误")
+                () -> BizException.unauthorized("用户不存在")
         );
 
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
-            throw BizException.unauthorized("用户不存在或密码错误");
+            throw BizException.unauthorized("密码错误");
         }
 
         if (user.getStatus() != UserStatus.ACTIVE) {

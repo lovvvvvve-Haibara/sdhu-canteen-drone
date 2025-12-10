@@ -12,3 +12,15 @@ spring:
     show-sql: true
     properties:
       hibernate.dialect: org.hibernate.dialect.MySQLDialect
+
+# 日志配置（注意：和 spring 同级，不要缩进到 spring 下面）
+logging:
+  level:
+    # 打印请求的基本信息（Controller 日志）
+    org.springframework.web: DEBUG
+
+    # 打印 @RequestBody 参数 & 返回值（非常详细）
+    org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor: TRACE
+
+    # 打印 JSON 转换的详细信息
+    org.springframework.http.converter.json: TRACE

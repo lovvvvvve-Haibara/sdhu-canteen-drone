@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人资料 - 用户管理系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .profile-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0, 0, 120, 0.08);
+            overflow: hidden;
+        }
+        
+        .profile-header {
+            background: linear-gradient(135deg, #1a6dcc 0%, #2c8cf0 100%);
+            color: white;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .profile-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .profile-content {
+            display: flex;
+            padding: 0;
+            min-height: 500px;
+        }
+        
+        /* 左侧用户信息卡片样式 */
+        .user-info-card {
+            width: 280px;
+            background-color: #f8fafd;
+            border-right: 1px solid #e8e8e8;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .avatar-container {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: #e6f0ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            border: 4px solid #d0e3ff;
+            overflow: hidden;
+        }
+        
+        .avatar-placeholder {
+            font-size: 48px;
+            color: #2c8cf0;
+            font-weight: 300;
+        }
+        
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .username {
+            font-size: 22px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .user-role {
+            display: inline-block;
+            background-color: #e6f0ff;
+            color: #2c8cf0;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+        
+        .user-details {
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eef2f7;
+            font-size: 14px;
+        }
+        
+        .detail-label {
+            color: #7f8c9a;
+        }
+        
+        .detail-value {
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        
+        /* 右侧选项卡样式 */
+        .tab-content {
+            flex: 1;
+            padding: 30px;
+        }
+        
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid #e8e8e8;
+            margin-bottom: 25px;
+        }
+        
+        .tab-btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #7f8c9a;
+            position: relative;
+            transition: color 0.2s;
+        }
+        
+        .tab-btn:hover {
+            color: #2c8cf0;
+        }
+        
+        .tab-btn.active {
+            color: #2c8cf0;
+        }
+        
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: #2c8cf0;
+            border-radius: 3px 3px 0 0;
+        }
+        
+        .tab-panel {
+            display: none;
+        }
+        
+        .tab-panel.active {
+            display: block;
+        }
+        
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d9e6;
+            border-radius: 6px;
+            font-size: 15px;
+            transition: border-color 0.2s;
+            background-color: #fff;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #2c8cf0;
+            box-shadow: 0 0 0 3px rgba(44, 140, 240, 0.1);
+        }
+        
+        .form-hint {
+            font-size: 13px;
+            color: #7f8c9a;
+            margin-top: 6px;
+        }
+        
+        /* 按钮样式 */
+        .btn {
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: #2c8cf0;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1a6dcc;
+        }
+        
+        .btn-primary:disabled {
+            background-color: #a0c8f8;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background-color: #f0f5ff;
+            color: #2c8cf0;
+            margin-right: 12px;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e1ecff;
+        }
+        
+        /* 消息提示样式 */
+        .message {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .message-success {
+            background-color: #f0f9ff;
+            color: #0c6efd;
+            border: 1px solid #b6d4fe;
+        }
+        
+        .message-error {
+            background-color: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c9a;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .profile-content {
+                flex-direction: column;
+            }
+            
+            .user-info-card {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #e8e8e8;
+            }
+            
+            .tabs-header {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="profile-container">
+            <div class="profile-header">
+                <h1>个人资料</h1>
+            </div>
+            
+            <div class="profile-content">
+                <!-- 左侧用户信息卡片 -->
+                <div class="user-info-card">
+                    <div class="avatar-container">
+                        <div class="avatar-placeholder" v-if="!user.avatar">{{ user.initials }}</div>
+                        <img v-else :src="user.avatar" alt="头像" class="avatar-img">
+                    </div>
+                    
+                    <h2 class="username">{{ user.displayName || user.username }}</h2>
+                    <div class="user-role">{{ user.roleName }}</div>
+                    
+                    <div class="user-details">
+                        <div class="detail-item">
+                            <span class="detail-label">用户名</span>
+                            <span class="detail-value">{{ user.username }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">手机号</span>
+                            <span class="detail-value">{{ user.phone || '未设置' }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">注册时间</span>
+                            <span class="detail-value">{{ user.createdAt }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 右侧选项卡内容 -->
+                <div class="tab-content">
+                    <div class="tabs-header">
+                        <button 
+                            class="tab-btn" 
+                            :class="{active: activeTab === 'basic'}"
+                            @click="activeTab = 'basic'"
+                        >
+                            基本信息
+                        </button>
+                        <button 
+                            class="tab-btn" 
+                            :class="{active: activeTab === 'password'}"
+                            @click="activeTab = 'password'"
+                        >
+                            修改密码
+                        </button>
+                    </div>
+                    
+                    <!-- 基本信息选项卡 -->
+                    <div class="tab-panel" :class="{active: activeTab === 'basic'}">
+                        <div v-if="loading" class="loading">
+                            加载中...
+                        </div>
+                        
+                        <div v-else>
+                            <div v-if="message" class="message" :class="messageClass">
+                                {{ message }}
+                            </div>
+                            
+                            <form @submit.prevent="updateProfile">
+                                <div class="form-group">
+                                    <label class="form-label">姓名</label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        v-model="profileForm.displayName"
+                                        placeholder="请输入您的姓名"
+                                    >
+                                    <div class="form-hint">这将作为您在系统中显示的名称</div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">手机号</label>
+                                    <input 
+                                        type="tel" 
+                                        class="form-control" 
+                                        v-model="profileForm.phone"
+                                        placeholder="请输入您的手机号"
+                                    >
+                                    <div class="form-hint">请填写有效的手机号码</div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <button 
+                                        type="submit" 
+                                        class="btn btn-primary"
+                                        :disabled="profileSaving || !profileFormChanged"
+                                    >
+                                        {{ profileSaving ? '保存中...' : '保存更改' }}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- 修改密码选项卡 -->
+                    <div class="tab-panel" :class="{active: activeTab === 'password'}">
+                        <div v-if="passwordMessage" class="message" :class="passwordMessageClass">
+                            {{ passwordMessage }}
+                        </div>
+                        
+                        <form @submit.prevent="changePassword">
+                            <div class="form-group">
+                                <label class="form-label">原密码</label>
+                                <input 
+                                    type="password" 
+                                    class="form-control" 
+                                    v-model="passwordForm.oldPassword"
+                                    placeholder="请输入原密码"
+                                >
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">新密码</label>
+                                <input 
+                                    type="password" 
+                                    class="form-control" 
+                                    v-model="passwordForm.newPassword"
+                                    placeholder="请输入新密码"
+                                >
+                                <div class="form-hint">密码长度至少6位</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">确认新密码</label>
+                                <input 
+                                    type="password" 
+                                    class="form-control" 
+                                    v-model="passwordForm.confirmPassword"
+                                    placeholder="请再次输入新密码"
+                                >
+                                <div class="form-hint" v-if="!passwordMatch && passwordForm.confirmPassword">
+                                    两次输入的密码不一致
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <button 
+                                    type="submit" 
+                                    class="btn btn-primary"
+                                    :disabled="passwordChanging || !passwordFormValid"
+                                >
+                                    {{ passwordChanging ? '修改中...' : '修改密码' }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟API响应数据
+        const mockUserData = {
+            id: 12345,
+            username: "zhangsan",
+            displayName: "张三同学",
+            phone: "13800000001",
+            roleName: "普通用户",
+            createdAt: "2023-06-15",
+            email: "zhangsan@example.com",
+            avatar: null
+        };
+
+        new Vue({
+            el: '#app',
+            data: {
+                activeTab: 'basic',
+                user: {
+                    id: null,
+                    username: '',
+                    displayName: '',
+                    phone: '',
+                    roleName: '',
+                    createdAt: '',
+                    email: '',
+                    avatar: null,
+                    initials: ''
+                },
+                profileForm: {
+                    displayName: '',
+                    phone: ''
+                },
+                passwordForm: {
+                    oldPassword: '',
+                    newPassword: '',
+                    confirmPassword: ''
+                },
+                loading: true,
+                profileSaving: false,
+                passwordChanging: false,
+                message: '',
+                messageType: '',
+                passwordMessage: '',
+                passwordMessageType: ''
+            },
+            computed: {
+                // 计算用户姓名的首字母
+                userInitials() {
+                    if (this.user.displayName) {
+                        return this.user.displayName.charAt(0).toUpperCase();
+                    } else if (this.user.username) {
+                        return this.user.username.charAt(0).toUpperCase();
+                    }
+                    return 'U';
+                },
+                
+                // 检查基本信息表单是否有更改
+                profileFormChanged() {
+                    return this.profileForm.displayName !== this.user.displayName || 
+                           this.profileForm.phone !== this.user.phone;
+                },
+                
+                // 检查密码表单是否有效
+                passwordFormValid() {
+                    return this.passwordForm.oldPassword && 
+                           this.passwordForm.newPassword && 
+                           this.passwordForm.confirmPassword &&
+                           this.passwordMatch &&
+                           this.passwordForm.newPassword.length >= 6;
+                },
+                
+                // 检查两次输入的新密码是否匹配
+                passwordMatch() {
+                    return this.passwordForm.newPassword === this.passwordForm.confirmPassword;
+                },
+                
+                // 消息样式类
+                messageClass() {
+                    return this.messageType === 'success' ? 'message-success' : 
+                           this.messageType === 'error' ? 'message-error' : '';
+                },
+                
+                // 密码消息样式类
+                passwordMessageClass() {
+                    return this.passwordMessageType === 'success' ? 'message-success' : 
+                           this.passwordMessageType === 'error' ? 'message-error' : '';
+                }
+            },
+            created() {
+                // 初始化用户数据
+                this.fetchUserData();
+            },
+            methods: {
+                // 获取用户信息
+                fetchUserData() {
+                    this.loading = true;
+                    
+                    // 模拟API请求
+                    setTimeout(() => {
+                        // 从URL参数获取userId（模拟）
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const userId = urlParams.get('userId') || 12345;
+                        
+                        // 模拟GET /api/users/self API调用
+                        this.user = { ...mockUserData };
+                        this.user.id = parseInt(userId);
+                        this.user.initials = this.userInitials;
+                        
+                        // 初始化表单数据
+                        this.profileForm.displayName = this.user.displayName;
+                        this.profileForm.phone = this.user.phone;
+                        
+                        this.loading = false;
+                    }, 500);
+                },
+                
+                // 更新个人资料
+                updateProfile() {
+                    if (!this.profileFormChanged) return;
+                    
+                    this.profileSaving = true;
+                    this.message = '';
+                    this.messageType = '';
+                    
+                    // 模拟PATCH /api/users/{id}/profile API调用
+                    setTimeout(() => {
+                        const requestData = {
+                            displayName: this.profileForm.displayName,
+                            phone: this.profileForm.phone
+                        };
+                        
+                        console.log('调用PATCH /api/users/' + this.user.id + '/profile', requestData);
+                        
+                        // 模拟成功响应
+                        this.user.displayName = this.profileForm.displayName;
+                        this.user.phone = this.profileForm.phone;
+                        this.user.initials = this.userInitials;
+                        
+                        this.message = '个人信息更新成功';
+                        this.messageType = 'success';
+                        this.profileSaving = false;
+                        
+                        // 3秒后清除消息
+                        setTimeout(() => {
+                            this.message = '';
+                            this.messageType = '';
+                        }, 3000);
+                    }, 800);
+                },
+                
+                // 修改密码
+                changePassword() {
+                    if (!this.passwordFormValid) return;
+                    
+                    this.passwordChanging = true;
+                    this.passwordMessage = '';
+                    this.passwordMessageType = '';
+                    
+                    // 模拟POST /api/users/{id}/password/change API调用
+                    setTimeout(() => {
+                        const requestData = {
+                            oldPassword: this.passwordForm.oldPassword,
+                            newPassword: this.passwordForm.newPassword
+                        };
+                        
+                        console.log('调用POST /api/users/' + this.user.id + '/password/change', requestData);
+                        
+                        // 模拟成功响应
+                        this.passwordMessage = '密码修改成功';
+                        this.passwordMessageType = 'success';
+                        
+                        // 清空表单
+                        this.passwordForm = {
+                            oldPassword: '',
+                            newPassword: '',
+                            confirmPassword: ''
+                        };
+                        
+                        this.passwordChanging = false;
+                        
+                        // 3秒后清除消息
+                        setTimeout(() => {
+                            this.passwordMessage = '';
+                            this.passwordMessageType = '';
+                        }, 3000);
+                    }, 800);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户注册</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f9ff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 450px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 100, 200, 0.08);
+            padding: 40px 35px;
+            border: 1px solid #e8f1ff;
+        }
+        
+        .title {
+            color: #1a6be0;
+            text-align: center;
+            font-size: 26px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+        
+        .form-group {
+            margin-bottom: 22px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 15px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #cce0ff;
+            border-radius: 6px;
+            font-size: 15px;
+            color: #333;
+            background-color: #fbfdff;
+            transition: border-color 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #1a6be0;
+            background-color: #fff;
+        }
+        
+        .form-input.error {
+            border-color: #e74c3c;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+        
+        .agreement-group {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 25px;
+        }
+        
+        .checkbox {
+            margin-right: 10px;
+            margin-top: 3px;
+            width: 18px;
+            height: 18px;
+            accent-color: #1a6be0;
+            cursor: pointer;
+        }
+        
+        .agreement-text {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        .register-btn {
+            width: 100%;
+            padding: 16px;
+            background-color: #1a6be0;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-bottom: 25px;
+        }
+        
+        .register-btn:hover {
+            background-color: #1559c7;
+        }
+        
+        .register-btn:disabled {
+            background-color: #a0c3f1;
+            cursor: not-allowed;
+        }
+        
+        .login-link {
+            text-align: center;
+            font-size: 15px;
+            color: #666;
+        }
+        
+        .login-link a {
+            color: #1a6be0;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .form-status {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .form-status.success {
+            display: block;
+            background-color: #e9f7ef;
+            color: #27ae60;
+            border: 1px solid #a3e9c0;
+        }
+        
+        .form-status.error {
+            display: block;
+            background-color: #fdeded;
+            color: #e74c3c;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @media (max-width: 480px) {
+            .card {
+                padding: 30px 25px;
+            }
+            
+            .title {
+                font-size: 24px;
+                margin-bottom: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="container">
+        <div class="card">
+            <h1 class="title">用户注册</h1>
+            
+            <!-- 注册状态提示 -->
+            <div :class="['form-status', registerStatus.type]" v-if="registerStatus.message">
+                {{ registerStatus.message }}
+            </div>
+            
+            <!-- 注册表单 -->
+            <form @submit.prevent="handleRegister">
+                <!-- 学号/工号 -->
+                <div class="form-group">
+                    <label class="form-label">学号/工号</label>
+                    <input 
+                        type="text" 
+                        class="form-input" 
+                        :class="{ error: errors.username }"
+                        v-model="formData.username"
+                        placeholder="请输入学号或工号"
+                        maxlength="20"
+                    >
+                    <div class="error-message" v-if="errors.username">{{ errors.username }}</div>
+                </div>
+                
+                <!-- 显示姓名 -->
+                <div class="form-group">
+                    <label class="form-label">显示姓名</label>
+                    <input 
+                        type="text" 
+                        class="form-input" 
+                        :class="{ error: errors.displayName }"
+                        v-model="formData.displayName"
+                        placeholder="请输入您的姓名"
+                        maxlength="20"
+                    >
+                    <div class="error-message" v-if="errors.displayName">{{ errors.displayName }}</div>
+                </div>
+                
+                <!-- 手机号 -->
+                <div class="form-group">
+                    <label class="form-label">手机号</label>
+                    <input 
+                        type="tel" 
+                        class="form-input" 
+                        :class="{ error: errors.phone }"
+                        v-model="formData.phone"
+                        placeholder="请输入手机号码"
+                        maxlength="11"
+                    >
+                    <div class="error-message" v-if="errors.phone">{{ errors.phone }}</div>
+                </div>
+                
+                <!-- 密码 -->
+                <div class="form-group">
+                    <label class="form-label">密码</label>
+                    <input 
+                        type="password" 
+                        class="form-input" 
+                        :class="{ error: errors.password }"
+                        v-model="formData.password"
+                        placeholder="请输入密码"
+                        maxlength="20"
+                    >
+                    <div class="error-message" v-if="errors.password">{{ errors.password }}</div>
+                </div>
+                
+                <!-- 确认密码 -->
+                <div class="form-group">
+                    <label class="form-label">确认密码</label>
+                    <input 
+                        type="password" 
+                        class="form-input" 
+                        :class="{ error: errors.confirmPassword }"
+                        v-model="confirmPassword"
+                        placeholder="请再次输入密码"
+                        maxlength="20"
+                    >
+                    <div class="error-message" v-if="errors.confirmPassword">{{ errors.confirmPassword }}</div>
+                </div>
+                
+                <!-- 注册协议 -->
+                <div class="agreement-group">
+                    <input 
+                        type="checkbox" 
+                        id="agreement" 
+                        class="checkbox" 
+                        v-model="agreementAccepted"
+                    >
+                    <label for="agreement" class="agreement-text">
+                        我已阅读并同意《用户注册协议》和《隐私政策》
+                    </label>
+                </div>
+                <div class="error-message" v-if="errors.agreement">{{ errors.agreement }}</div>
+                
+                <!-- 注册按钮 -->
+                <button 
+                    type="submit" 
+                    class="register-btn"
+                    :disabled="isSubmitting"
+                >
+                    {{ isSubmitting ? '注册中...' : '立即注册' }}
+                </button>
+            </form>
+            
+            <!-- 底部登录链接 -->
+            <div class="login-link">
+                已有账号？<a href="#" @click.prevent="goToLogin">立即登录</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, reactive } = Vue;
+        
+        createApp({
+            setup() {
+                // 表单数据 - 匹配API要求的格式
+                const formData = reactive({
+                    username: '',
+                    displayName: '',
+                    password: '',
+                    phone: ''
+                });
+                
+                // 确认密码
+                const confirmPassword = ref('');
+                
+                // 协议接受状态
+                const agreementAccepted = ref(false);
+                
+                // 表单验证错误信息
+                const errors = reactive({
+                    username: '',
+                    displayName: '',
+                    password: '',
+                    confirmPassword: '',
+                    phone: '',
+                    agreement: ''
+                });
+                
+                // 注册状态
+                const registerStatus = reactive({
+                    type: '', // 'success' 或 'error'
+                    message: ''
+                });
+                
+                // 提交状态
+                const isSubmitting = ref(false);
+                
+                // 表单验证
+                const validateForm = () => {
+                    let isValid = true;
+                    
+                    // 重置错误信息
+                    Object.keys(errors).forEach(key => errors[key] = '');
+                    
+                    // 验证学号/工号
+                    if (!formData.username.trim()) {
+                        errors.username = '学号/工号不能为空';
+                        isValid = false;
+                    } else if (!/^\w{6,20}$/.test(formData.username)) {
+                        errors.username = '学号/工号必须是6-20位字母、数字或下划线';
+                        isValid = false;
+                    }
+                    
+                    // 验证姓名
+                    if (!formData.displayName.trim()) {
+                        errors.displayName = '姓名不能为空';
+                        isValid = false;
+                    } else if (formData.displayName.trim().length < 2 || formData.displayName.trim().length > 20) {
+                        errors.displayName = '姓名长度必须在2-20个字符之间';
+                        isValid = false;
+                    }
+                    
+                    // 验证手机号
+                    if (!formData.phone.trim()) {
+                        errors.phone = '手机号不能为空';
+                        isValid = false;
+                    } else if (!/^1[3-9]\d{9}$/.test(formData.phone.trim())) {
+                        errors.phone = '请输入有效的手机号码';
+                        isValid = false;
+                    }
+                    
+                    // 验证密码
+                    if (!formData.password) {
+                        errors.password = '密码不能为空';
+                        isValid = false;
+                    } else if (formData.password.length < 6 || formData.password.length > 20) {
+                        errors.password = '密码长度必须在6-20个字符之间';
+                        isValid = false;
+                    }
+                    
+                    // 验证确认密码
+                    if (!confirmPassword.value) {
+                        errors.confirmPassword = '请再次输入密码';
+                        isValid = false;
+                    } else if (formData.password !== confirmPassword.value) {
+                        errors.confirmPassword = '两次输入的密码不一致';
+                        isValid = false;
+                    }
+                    
+                    // 验证协议
+                    if (!agreementAccepted.value) {
+                        errors.agreement = '请阅读并同意注册协议';
+                        isValid = false;
+                    }
+                    
+                    return isValid;
+                };
+                
+                // 模拟API调用
+                const mockApiCall = (data) => {
+                    return new Promise((resolve, reject) => {
+                        setTimeout(() => {
+                            // 模拟API响应
+                            const response = {
+                                code: 200,
+                                message: '注册成功',
+                                data: {
+                                    id: 1001,
+                                    username: data.username,
+                                    displayName: data.displayName,
+                                    phone: data.phone,
+                                    createTime: new Date().toISOString()
+                                }
+                            };
+                            resolve(response);
+                            
+                            // 模拟错误情况
+                            // reject({ code: 400, message: '用户已存在' });
+                        }, 1500);
+                    });
+                };
+                
+                // 处理注册提交
+                const handleRegister = async () => {
+                    // 验证表单
+                    if (!validateForm()) {
+                        return;
+                    }
+                    
+                    // 设置提交状态
+                    isSubmitting.value = true;
+                    registerStatus.message = '';
+                    
+                    try {
+                        // 准备API请求数据
+                        const requestData = {
+                            username: formData.username.trim(),
+                            displayName: formData.displayName.trim(),
+                            password: formData.password,
+                            phone: formData.phone.trim()
+                        };
+                        
+                        // 调用API
+                        const response = await mockApiCall(requestData);
+                        
+                        // 显示成功消息
+                        registerStatus.type = 'success';
+                        registerStatus.message = response.message || '注册成功！';
+                        
+                        // 重置表单
+                        resetForm();
+                        
+                    } catch (error) {
+                        // 显示错误消息
+                        registerStatus.type = 'error';
+                        registerStatus.message = error.message || '注册失败，请稍后重试';
+                    } finally {
+                        // 重置提交状态
+                        isSubmitting.value = false;
+                        
+                        // 5秒后清除状态消息
+                        setTimeout(() => {
+                            registerStatus.message = '';
+                        }, 5000);
+                    }
+                };
+                
+                // 重置表单
+                const resetForm = () => {
+                    formData.username = '';
+                    formData.displayName = '';
+                    formData.password = '';
+                    formData.phone = '';
+                    confirmPassword.value = '';
+                    agreementAccepted.value = false;
+                    
+                    // 清除错误信息
+                    Object.keys(errors).forEach(key => errors[key] = '');
+                };
+                
+                // 跳转到登录页面
+                const goToLogin = () => {
+                    alert('跳转到登录页面（此处仅演示）');
+                    // 实际项目中这里应该是页面跳转逻辑
+                };
+                
+                return {
+                    formData,
+                    confirmPassword,
+                    agreementAccepted,
+                    errors,
+                    registerStatus,
+                    isSubmitting,
+                    handleRegister,
+                    goToLogin
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
