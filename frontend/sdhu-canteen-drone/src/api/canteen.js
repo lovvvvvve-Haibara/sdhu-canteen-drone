@@ -1,11 +1,42 @@
-import http from './http'
+// src/api/canteen.js
+import request from './request'
 
-// 食堂列表：GET /api/canteens?page=&size=&status=
 export function listCanteens(params) {
-  return http.get('/api/canteens', { params })
+  // params: { page, size, status? }
+  return request({
+    url: '/api/canteens',
+    method: 'get',
+    params
+  })
 }
 
-// 食堂详情：GET /api/canteens/{id}
-export function getCanteenById(id) {
-  return http.get(`/api/canteens/${id}`)
+export function getCanteenDetail(id) {
+  return request({
+    url: `/api/canteens/${id}`,
+    method: 'get'
+  })
+}
+
+export function createCanteen(data) {
+  return request({
+    url: '/api/canteens',
+    method: 'post',
+    data
+  })
+}
+
+export function updateCanteen(id, data) {
+  return request({
+    url: `/api/canteens/${id}`,
+    method: 'patch',
+    data
+  })
+}
+
+export function updateCanteenStatus(id, status) {
+  return request({
+    url: `/api/canteens/${id}/status`,
+    method: 'patch',
+    params: { status }
+  })
 }

@@ -5,7 +5,7 @@
         <el-space>
           <span>当前用户：{{ userStore.user?.displayName || '未登录' }}</span>
           <el-button type="primary" @click="goMyOrders">我的订单</el-button>
-          <el-button type="danger" @click="onLogout">退出登录</el-button>
+          <el-button type="danger" @click="onLogout">退出登录</el-button> 
         </el-space>
       </template>
     </el-page-header>

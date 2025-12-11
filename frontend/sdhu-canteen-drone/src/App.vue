@@ -1,17 +1,12 @@
+<!-- src/App.vue -->
 <template>
   <router-view />
 </template>
 
 <script setup>
-// 这里暂时不放布局，直接由各个页面自己组织布局。
-// 后面如果你想做顶栏/侧边栏，我们可以在这里加 MainLayout。
+// 一般这里不需要写任何逻辑，除非你有全局性的东西
 </script>
 
 <style>
-html,
-body,
-#app {
-  height: 100%;
-  margin: 0;
-}
+/* 如果有全局样式，可以写这里，也可以单独建 global.css 引入 */
 </style>

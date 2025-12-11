@@ -1,18 +1,43 @@
-import http from './http'
+// src/api/user.js
+import request from './request'
 
-// 登录：POST /api/users/login
-// 请求体 SelfUser.LoginReq：{ usernameOrPhone, password }
-export function login(data) {
-  return http.post('/api/users/login', data)
+export function getUserDetail(id) {
+  return request({
+    url: `/api/users/${id}`,
+    method: 'get'
+  })
 }
 
-// 注册：POST /api/users/register
-// 请求体 SelfUser.RegisterReq：{ username, displayName, password }
-export function register(data) {
-  return http.post('/api/users/register', data)
+export function getUserList(params) {
+  // params: { page, size, role?, status? }
+  return request({
+    url: '/api/users',
+    method: 'get',
+    params
+  })
 }
 
-// 获取当前用户信息：GET /api/users/self?userId=...
-export function fetchSelf(userId) {
-  return http.get('/api/users/self', { params: { userId } })
+export function searchUsers(params) {
+  // params: { keyword, page, size }
+  return request({
+    url: '/api/users/search',
+    method: 'get',
+    params
+  })
+}
+
+export function updateUserStatus(id, status) {
+  return request({
+    url: `/api/users/${id}/status`,
+    method: 'patch',
+    params: { status }
+  })
+}
+
+export function updateUserRole(id, role) {
+  return request({
+    url: `/api/users/${id}/role`,
+    method: 'patch',
+    params: { role }
+  })
 }
