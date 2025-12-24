@@ -8,6 +8,7 @@ const Register = () => import('../views/auth/Register.vue')
 const UserLayout = () => import('../views/user/UserLayout.vue')
 const UserHome = () => import('../views/user/UserHome.vue')
 const UserOrders = () => import('../views/user/OrderList.vue')
+const UserOrderQuery = () => import('../views/user/OrderQuery.vue')
 
 const AdminLayout = () => import('../views/admin/AdminLayout.vue')
 const Dashboard = () => import('../views/admin/Dashboard.vue')
@@ -48,6 +49,11 @@ const router = createRouter({
           path: 'orders',
           name: 'UserOrders',
           component: UserOrders
+        },
+        {
+          path: 'order-query',
+          name: 'UserOrderQuery',
+          component: UserOrderQuery
         },
         {
           path: '',

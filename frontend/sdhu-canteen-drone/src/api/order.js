@@ -35,6 +35,10 @@ export function listMyOrders(params) {
   })
 }
 
+export function getMyOrders(params) {
+  return listMyOrders(params)
+}
+
 /**
  * 顾客取消订单
  * POST /api/orders/{id}/cancel

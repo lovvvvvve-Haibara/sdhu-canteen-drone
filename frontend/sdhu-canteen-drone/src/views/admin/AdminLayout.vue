@@ -54,10 +54,11 @@ const logout = () => {
 }
 
 .aside {
-  background: #001529;
-  color: #fff;
+  background: #ffffff;
+  color: #303133;
   display: flex;
   flex-direction: column;
+  border-right: 1px solid #eef1f6;
 }
 
 .logo {
@@ -67,12 +68,13 @@ const logout = () => {
   padding: 0 16px;
   font-weight: 600;
   font-size: 15px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid #eef1f6;
 }
 
 .menu {
   border-right: none;
   flex: 1;
+  background: transparent;
 }
 
 .header {
@@ -80,7 +82,8 @@ const logout = () => {
   justify-content: flex-end;
   align-items: center;
   background: #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.06);
+  border-bottom: 1px solid #f0f2f5;
 }
 
 .header-right {
@@ -95,7 +98,7 @@ const logout = () => {
 }
 
 .main {
-  background: #f5f7fa;
-  padding: 16px;
+  background: #f7f8fb;
+  padding: 20px;
 }
 </style>
