@@ -109,10 +109,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.page {
-  padding: 16px 24px;
-}
-
 .filter-row {
   margin: 16px 0;
   display: flex;

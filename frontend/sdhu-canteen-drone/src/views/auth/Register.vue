@@ -115,7 +115,10 @@ const rules = {
 
 const onSubmit = () => {
   formRef.value.validate(async (valid) => {
-    if (!valid) return
+    if (!valid) {
+      ElMessage.warning('请完善注册信息')
+      return
+    }
     loading.value = true
     try {
       await register({
@@ -143,15 +146,31 @@ const goLogin = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at top left, #ecf5ff, #f5f7fa);
+  padding: 24px;
+  background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.2), transparent 45%);
 }
 
 .auth-card {
   width: 420px;
-  padding: 32px 28px 28px;
-  border-radius: 18px;
-  background: #ffffff;
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.06);
+  padding: 36px 32px 32px;
+  border-radius: 20px;
+  background: var(--app-panel);
+  border: 1px solid var(--app-border);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-card::before {
+  content: "";
+  position: absolute;
+  top: -60%;
+  right: -30%;
+  width: 240px;
+  height: 240px;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.35), transparent 70%);
+  filter: blur(4px);
 }
 
 .title {
@@ -159,12 +178,13 @@ const goLogin = () => {
   font-size: 22px;
   font-weight: 600;
   text-align: center;
+  color: var(--app-text);
 }
 
 .subtitle {
   margin: 0 0 24px;
   font-size: 13px;
-  color: #909399;
+  color: var(--app-text-muted);
   text-align: center;
 }
 
@@ -173,5 +193,9 @@ const goLogin = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+:deep(.el-form-item__label) {
+  color: var(--app-text-muted);
 }
 </style>

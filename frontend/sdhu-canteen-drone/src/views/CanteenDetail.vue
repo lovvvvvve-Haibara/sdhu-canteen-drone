@@ -269,10 +269,6 @@ watch(
 </script>
 
 <style scoped>
-.page {
-  padding: 16px 24px;
-}
-
 .layout {
   margin-top: 16px;
   display: flex;

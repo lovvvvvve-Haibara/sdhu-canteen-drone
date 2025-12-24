@@ -485,7 +485,7 @@ onMounted(async () => {
 
 .dialog-subtitle {
   font-size: 13px;
-  color: #606266;
+  color: var(--app-text-muted);
   margin-bottom: 4px;
 }
 </style>
