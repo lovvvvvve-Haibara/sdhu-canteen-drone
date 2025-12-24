@@ -15,7 +15,7 @@
           <el-option label="已确认" value="CONFIRMED" />
           <el-option label="配送中" value="SHIPPED" />
           <el-option label="已完成" value="COMPLETED" />
-          <el-option label="已取消" value="CANCELLED" />
+          <el-option label="已取消" value="CANCELED" />
         </el-select>
       </div>
     </template>
@@ -125,10 +125,12 @@ const loadOrders = async () => {
     })
     state.orders = pageData.content || []
     state.total = pageData.totalElements || 0
+  } catch {
+    state.orders = []
+    state.total = 0
   } finally {
     state.loading = false
   }
-    console.log('response:', pageData)
 }
 
 const onPageChange = (page) => {

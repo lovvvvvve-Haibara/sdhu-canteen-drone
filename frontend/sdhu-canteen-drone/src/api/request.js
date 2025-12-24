@@ -25,17 +25,30 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   (response) => {
     const res = response.data
-    // 后端格式：{ code, message, data }
-    if (typeof res.code !== 'undefined' && res.code !== 0) {
+    // 兼容后端格式：
+    // 1) { success, message, data }
+    if (res && typeof res.success === 'boolean') {
+      if (!res.success) {
+        ElMessage.error(res.message || '请求失败')
+        return Promise.reject(new Error(res.message || 'Error'))
+      }
+      return res.data
+    }
+    // 2) { code, message, data }
+    if (typeof res?.code !== 'undefined' && res.code !== 0) {
       ElMessage.error(res.message || '请求失败')
       return Promise.reject(new Error(res.message || 'Error'))
     }
-    // 关键：只返回 res.data
-    return res.data  // 这一行决定了 getMyOrders 的返回值
+    // 3) 其他格式，直接返回
+    return typeof res?.code !== 'undefined' ? res.data : res
   },
   (error) => {
     const msg =
       error.response?.data?.message ||
+      error.response?.data?.error ||
+      (error.response?.status
+        ? `请求失败（${error.response.status}）`
+        : '') ||
       error.message ||
       '网络异常，请稍后重试'
     ElMessage.error(msg)
