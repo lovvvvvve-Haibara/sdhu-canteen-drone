@@ -35,6 +35,7 @@ public class OrderDto {
         private String canteenName;      // 方便前端展示（可选）
 
         private OrderStatus status;
+        private String statusLabel;   // ★ 中文显示给前端用
         private DeliverMethod deliveryMethod;
 
         /**
@@ -73,6 +74,7 @@ public class OrderDto {
         private String canteenName;
 
         private OrderStatus status;
+        private String statusLabel;   // ★ 中文显示给前端用
         private DeliverMethod deliveryMethod;
 
         private Long droneId;            // 对应 orders.drone_id

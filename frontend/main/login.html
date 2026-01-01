@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登录</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+        }
+        
+        .login-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 40px 35px;
+            border-top: 4px solid #1890ff;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-title {
+            color: #1890ff;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .login-subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            color: #333;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+        
+        .form-input.error {
+            border-color: #ff4d4f;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .checkbox-input {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            accent-color: #1890ff;
+        }
+        
+        .checkbox-label {
+            color: #333;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .login-button {
+            width: 100%;
+            background-color: #1890ff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 12px 0;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .login-button:hover {
+            background-color: #40a9ff;
+        }
+        
+        .login-button:active {
+            background-color: #096dd9;
+        }
+        
+        .login-button:disabled {
+            background-color: #bae7ff;
+            cursor: not-allowed;
+        }
+        
+        .login-footer {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .footer-link {
+            color: #1890ff;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        
+        .footer-link:hover {
+            color: #40a9ff;
+            text-decoration: underline;
+        }
+        
+        .error-message {
+            color: #ff4d4f;
+            font-size: 13px;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .error-icon {
+            margin-right: 5px;
+            font-size: 14px;
+        }
+        
+        .api-info {
+            background-color: #f6ffed;
+            border: 1px solid #b7eb8f;
+            border-radius: 4px;
+            padding: 12px 15px;
+            margin-top: 25px;
+            font-size: 13px;
+        }
+        
+        .api-info-title {
+            color: #52c41a;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .api-info-content {
+            color: #333;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 30px 25px;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1 class="login-title">用户登录</h1>
+                <p class="login-subtitle">请输入您的登录信息</p>
+            </div>
+            
+            <form @submit.prevent="handleLogin">
+                <div class="form-group">
+                    <label class="form-label" for="username">用户名 / 手机号</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        class="form-input" 
+                        v-model="loginForm.usernameOrPhone"
+                        :class="{ error: errors.usernameOrPhone }"
+                        placeholder="请输入用户名或手机号"
+                        @input="clearError('usernameOrPhone')"
+                    >
+                    <div class="error-message" v-if="errors.usernameOrPhone">
+                        <span class="error-icon">⚠</span> {{ errors.usernameOrPhone }}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="password">密码</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        class="form-input" 
+                        v-model="loginForm.password"
+                        :class="{ error: errors.password }"
+                        placeholder="请输入密码"
+                        @input="clearError('password')"
+                    >
+                    <div class="error-message" v-if="errors.password">
+                        <span class="error-icon">⚠</span> {{ errors.password }}
+                    </div>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input 
+                        type="checkbox" 
+                        id="remember" 
+                        class="checkbox-input" 
+                        v-model="loginForm.rememberMe"
+                    >
+                    <label class="checkbox-label" for="remember">记住我</label>
+                </div>
+                
+                <button 
+                    type="submit" 
+                    class="login-button"
+                    :disabled="isSubmitting"
+                >
+                    {{ isSubmitting ? '登录中...' : '登录' }}
+                </button>
+            </form>
+            
+            <div class="login-footer">
+                <div class="footer-links">
+                    <a href="#" class="footer-link">注册账号</a>
+                    <a href="#" class="footer-link">忘记密码</a>
+                </div>
+            </div>
+            
+            <div class="api-info" v-if="showApiInfo">
+                <div class="api-info-title">API请求信息</div>
+                <div class="api-info-content">
+                    <div><strong>URL:</strong> POST /api/users/login</div>
+                    <div><strong>请求体:</strong> {{ JSON.stringify(apiRequestBody) }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    loginForm: {
+                        usernameOrPhone: '',
+                        password: '',
+                        rememberMe: false
+                    },
+                    errors: {
+                        usernameOrPhone: '',
+                        password: ''
+                    },
+                    isSubmitting: false,
+                    showApiInfo: false
+                }
+            },
+            computed: {
+                apiRequestBody() {
+                    // 按照API格式准备数据，只包含必要的字段
+                    return {
+                        usernameOrPhone: this.loginForm.usernameOrPhone,
+                        password: this.loginForm.password
+                    };
+                }
+            },
+            methods: {
+                validateForm() {
+                    let isValid = true;
+                    this.errors = { usernameOrPhone: '', password: '' };
+                    
+                    if (!this.loginForm.usernameOrPhone.trim()) {
+                        this.errors.usernameOrPhone = '请输入用户名或手机号';
+                        isValid = false;
+                    }
+                    
+                    if (!this.loginForm.password) {
+                        this.errors.password = '请输入密码';
+                        isValid = false;
+                    } else if (this.loginForm.password.length < 6) {
+                        this.errors.password = '密码长度不能少于6位';
+                        isValid = false;
+                    }
+                    
+                    return isValid;
+                },
+                
+                clearError(field) {
+                    if (this.errors[field]) {
+                        this.errors[field] = '';
+                    }
+                },
+                
+                handleLogin() {
+                    if (!this.validateForm()) {
+                        return;
+                    }
+                    
+                    this.isSubmitting = true;
+                    this.showApiInfo = true;
+                    
+                    // 模拟API请求
+                    setTimeout(() => {
+                        console.log('发送登录请求:', this.apiRequestBody);
+                        alert(`登录请求已发送\nAPI: POST /api/users/login\n请求体: ${JSON.stringify(this.apiRequestBody)}`);
+                        this.isSubmitting = false;
+                    }, 1000);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

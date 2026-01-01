@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的订单</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .page-header {
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #1890ff;
+        }
+        
+        .page-header h1 {
+            color: #1890ff;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        /* 状态筛选选项卡 */
+        .status-tabs {
+            display: flex;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        
+        .tab-item {
+            flex: 1;
+            padding: 16px 0;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 15px;
+            color: #555;
+            transition: all 0.2s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab-item:hover {
+            background-color: #f0f7ff;
+        }
+        
+        .tab-item.active {
+            color: #1890ff;
+            border-bottom: 3px solid #1890ff;
+            background-color: #f0f7ff;
+        }
+        
+        /* 订单列表 */
+        .orders-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .order-item {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            transition: box-shadow 0.2s ease;
+        }
+        
+        .order-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .order-info {
+            flex: 1;
+        }
+        
+        .order-number {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+            font-size: 16px;
+        }
+        
+        .order-time {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .order-amount {
+            font-weight: 600;
+            color: #fa541c;
+            font-size: 18px;
+        }
+        
+        /* 订单状态标签 */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .status-all {
+            background-color: #e6f7ff;
+            color: #1890ff;
+        }
+        
+        .status-pending_payment {
+            background-color: #fff7e6;
+            color: #fa8c16;
+        }
+        
+        .status-pending_accept {
+            background-color: #fff1f0;
+            color: #f5222d;
+        }
+        
+        .status-delivering {
+            background-color: #f6ffed;
+            color: #52c41a;
+        }
+        
+        .status-completed {
+            background-color: #f6ffed;
+            color: #52c41a;
+        }
+        
+        .status-cancelled {
+            background-color: #fafafa;
+            color: #8c8c8c;
+        }
+        
+        /* 商品简要信息 */
+        .products-section {
+            margin-bottom: 20px;
+        }
+        
+        .products-section h3 {
+            font-size: 15px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        
+        .products-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .product-item {
+            display: flex;
+            align-items: center;
+            background-color: #fafafa;
+            border-radius: 6px;
+            padding: 8px 12px;
+            width: calc(50% - 6px);
+        }
+        
+        .product-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 4px;
+            background-color: #e6f7ff;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1890ff;
+            font-size: 12px;
+        }
+        
+        .product-info {
+            flex: 1;
+        }
+        
+        .product-name {
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: #333;
+        }
+        
+        .product-price {
+            color: #fa541c;
+            font-size: 14px;
+        }
+        
+        /* 操作按钮 */
+        .order-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            border-top: 1px solid #f0f0f0;
+            padding-top: 16px;
+        }
+        
+        .action-btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            font-size: 14px;
+        }
+        
+        .btn-cancel {
+            background-color: #fff1f0;
+            color: #f5222d;
+            border: 1px solid #ffa39e;
+        }
+        
+        .btn-cancel:hover {
+            background-color: #ffccc7;
+        }
+        
+        .btn-detail {
+            background-color: #e6f7ff;
+            color: #1890ff;
+            border: 1px solid #91d5ff;
+        }
+        
+        .btn-detail:hover {
+            background-color: #bae7ff;
+        }
+        
+        .btn-disabled {
+            background-color: #f5f5f5;
+            color: #bfbfbf;
+            cursor: not-allowed;
+            border: 1px solid #d9d9d9;
+        }
+        
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .empty-icon {
+            font-size: 60px;
+            color: #d9d9d9;
+            margin-bottom: 20px;
+        }
+        
+        .empty-text {
+            color: #8c8c8c;
+            font-size: 16px;
+        }
+        
+        /* 分页 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+            gap: 8px;
+        }
+        
+        .page-btn {
+            padding: 8px 16px;
+            background-color: white;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .page-btn:hover:not(.disabled) {
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+        
+        .page-btn.disabled {
+            color: #bfbfbf;
+            cursor: not-allowed;
+        }
+        
+        .page-info {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        /* 取消订单模态框 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            resize: vertical;
+            min-height: 100px;
+            font-size: 14px;
+        }
+        
+        .form-textarea:focus {
+            outline: none;
+            border-color: #1890ff;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        .btn-primary {
+            background-color: #1890ff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .btn-primary:hover {
+            background-color: #40a9ff;
+        }
+        
+        .btn-secondary {
+            background-color: #f5f5f5;
+            color: #666;
+            border: 1px solid #d9d9d9;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e6e6e6;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .status-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab-item {
+                flex: 1 0 33.333%;
+                padding: 12px 0;
+                font-size: 14px;
+            }
+            
+            .product-item {
+                width: 100%;
+            }
+            
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .order-amount {
+                margin-top: 8px;
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <!-- 页面标题 -->
+            <div class="page-header">
+                <h1>我的订单</h1>
+            </div>
+            
+            <!-- 状态筛选选项卡 -->
+            <div class="status-tabs">
+                <div 
+                    v-for="tab in tabs" 
+                    :key="tab.status"
+                    :class="['tab-item', { active: selectedStatus === tab.status }]"
+                    @click="selectStatus(tab.status)"
+                >
+                    {{ tab.name }}
+                </div>
+            </div>
+            
+            <!-- 订单列表 -->
+            <div v-if="orders.length > 0" class="orders-list">
+                <div v-for="order in orders" :key="order.id" class="order-item">
+                    <div class="order-header">
+                        <div class="order-info">
+                            <div class="order-number">订单号: {{ order.orderNumber }}</div>
+                            <div class="order-time">下单时间: {{ formatTime(order.orderTime) }}</div>
+                        </div>
+                        <div class="order-amount">¥{{ order.totalAmount.toFixed(2) }}</div>
+                    </div>
+                    
+                    <div class="status-badge-container">
+                        <span :class="['status-badge', getStatusClass(order.status)]">
+                            {{ getStatusText(order.status) }}
+                        </span>
+                    </div>
+                    
+                    <div class="products-section">
+                        <h3>商品信息</h3>
+                        <div class="products-list">
+                            <div v-for="product in order.products" :key="product.id" class="product-item">
+                                <div class="product-image">
+                                    {{ product.name.substring(0, 1) }}
+                                </div>
+                                <div class="product-info">
+                                    <div class="product-name">{{ product.name }}</div>
+                                    <div class="product-price">¥{{ product.price.toFixed(2) }} × {{ product.quantity }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="order-actions">
+                        <button 
+                            v-if="canCancel(order)"
+                            @click="openCancelModal(order)"
+                            class="action-btn btn-cancel"
+                        >
+                            取消订单
+                        </button>
+                        <button 
+                            v-else
+                            class="action-btn btn-disabled"
+                            disabled
+                        >
+                            无法取消
+                        </button>
+                        <button class="action-btn btn-detail" @click="viewOrderDetail(order)">
+                            查看详情
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 空状态 -->
+            <div v-else class="empty-state">
+                <div class="empty-icon">📦</div>
+                <div class="empty-text">暂无订单记录</div>
+            </div>
+            
+            <!-- 分页 -->
+            <div v-if="totalPages > 1" class="pagination">
+                <button 
+                    class="page-btn" 
+                    :class="{ disabled: currentPage === 0 }"
+                    @click="changePage(currentPage - 1)"
+                    :disabled="currentPage === 0"
+                >
+                    上一页
+                </button>
+                <span class="page-info">第 {{ currentPage + 1 }} 页 / 共 {{ totalPages }} 页</span>
+                <button 
+                    class="page-btn" 
+                    :class="{ disabled: currentPage === totalPages - 1 }"
+                    @click="changePage(currentPage + 1)"
+                    :disabled="currentPage === totalPages - 1"
+                >
+                    下一页
+                </button>
+            </div>
+            
+            <!-- 取消订单模态框 -->
+            <div v-if="showCancelModal" class="modal-overlay">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="modal-title">取消订单</div>
+                        <button class="modal-close" @click="closeCancelModal">×</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">取消原因:</label>
+                        <textarea 
+                            v-model="cancelReason" 
+                            class="form-textarea" 
+                            placeholder="请输入取消订单的原因..."
+                        ></textarea>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button class="btn-secondary" @click="closeCancelModal">取消</button>
+                        <button class="btn-primary" @click="confirmCancelOrder">确认取消</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    // 订单状态选项卡
+                    tabs: [
+                        { status: 'all', name: '全部' },
+                        { status: 'pending_payment', name: '待支付' },
+                        { status: 'pending_accept', name: '待接单' },
+                        { status: 'delivering', name: '配送中' },
+                        { status: 'completed', name: '已完成' },
+                        { status: 'cancelled', name: '已取消' }
+                    ],
+                    selectedStatus: 'all',
+                    
+                    // 订单数据
+                    orders: [],
+                    
+                    // 分页信息
+                    currentPage: 0,
+                    pageSize: 5,
+                    totalPages: 1,
+                    
+                    // 取消订单模态框
+                    showCancelModal: false,
+                    cancelReason: '',
+                    cancelingOrder: null
+                };
+            },
+            created() {
+                // 模拟加载订单数据
+                this.loadOrders();
+            },
+            methods: {
+                // 选择订单状态
+                selectStatus(status) {
+                    this.selectedStatus = status;
+                    this.currentPage = 0;
+                    this.loadOrders();
+                },
+                
+                // 加载订单数据（模拟API调用）
+                loadOrders() {
+                    // 模拟API请求延迟
+                    setTimeout(() => {
+                        // 模拟订单数据
+                        const mockOrders = this.generateMockOrders();
+                        
+                        // 根据状态筛选
+                        let filteredOrders = mockOrders;
+                        if (this.selectedStatus !== 'all') {
+                            filteredOrders = mockOrders.filter(order => order.status === this.selectedStatus);
+                        }
+                        
+                        // 模拟分页
+                        const startIndex = this.currentPage * this.pageSize;
+                        const endIndex = startIndex + this.pageSize;
+                        this.orders = filteredOrders.slice(startIndex, endIndex);
+                        
+                        // 计算总页数
+                        this.totalPages = Math.ceil(filteredOrders.length / this.pageSize);
+                    }, 300);
+                },
+                
+                // 生成模拟订单数据
+                generateMockOrders() {
+                    const statuses = ['pending_payment', 'pending_accept', 'delivering', 'completed', 'cancelled'];
+                    const orderNumbers = ['ORD20230520001', 'ORD20230519002', 'ORD20230518003', 'ORD20230517004', 'ORD20230516005', 'ORD20230515006', 'ORD20230514007', 'ORD20230513008', 'ORD20230512009', 'ORD20230511010'];
+                    
+                    const products = [
+                        { id: 1, name: '牛肉汉堡套餐', price: 32.5, quantity: 1 },
+                        { id: 2, name: '香辣鸡翅（6个）', price: 18.0, quantity: 1 },
+                        { id: 3, name: '经典咖啡', price: 15.0, quantity: 2 },
+                        { id: 4, name: '蔬菜沙拉', price: 12.5, quantity: 1 },
+                        { id: 5, name: '薯条（大份）', price: 10.0, quantity: 1 },
+                        { id: 6, name: '冰淇淋圣代', price: 8.0, quantity: 1 }
+                    ];
+                    
+                    return orderNumbers.map((orderNumber, index) => {
+                        // 随机选择2-3个商品
+                        const productCount = Math.floor(Math.random() * 2) + 2;
+                        const orderProducts = [];
+                        const usedIndices = new Set();
+                        
+                        for (let i = 0; i < productCount; i++) {
+                            let productIndex;
+                            do {
+                                productIndex = Math.floor(Math.random() * products.length);
+                            } while (usedIndices.has(productIndex));
+                            
+                            usedIndices.add(productIndex);
+                            orderProducts.push({...products[productIndex]});
+                        }
+                        
+                        // 计算总金额
+                        const totalAmount = orderProducts.reduce((sum, product) => sum + product.price * product.quantity, 0);
+                        
+                        // 模拟时间倒序（最新的订单在前面）
+                        const daysAgo = index;
+                        const orderTime = new Date();
+                        orderTime.setDate(orderTime.getDate() - daysAgo);
+                        
+                        return {
+                            id: index + 1,
+                            orderNumber: orderNumber,
+                            orderTime: orderTime.toISOString(),
+                            totalAmount: totalAmount,
+                            status: statuses[index % statuses.length],
+                            products: orderProducts
+                        };
+                    }).sort((a, b) => new Date(b.orderTime) - new Date(a.orderTime)); // 时间倒序
+                },
+                
+                // 格式化时间
+                formatTime(timeStr) {
+                    const date = new Date(timeStr);
+                    return `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+                },
+                
+                // 获取状态文本
+                getStatusText(status) {
+                    const statusMap = {
+                        'pending_payment': '待支付',
+                        'pending_accept': '待接单',
+                        'delivering': '配送中',
+                        'completed': '已完成',
+                        'cancelled': '已取消'
+                    };
+                    return statusMap[status] || status;
+                },
+                
+                // 获取状态样式类
+                getStatusClass(status) {
+                    return `status-${status}`;
+                },
+                
+                // 判断订单是否可以取消
+                canCancel(order) {
+                    // 只有待支付和待接单的订单可以取消
+                    return order.status === 'pending_payment' || order.status === 'pending_accept';
+                },
+                
+                // 打开取消订单模态框
+                openCancelModal(order) {
+                    this.cancelingOrder = order;
+                    this.cancelReason = '';
+                    this.showCancelModal = true;
+                },
+                
+                // 关闭取消订单模态框
+                closeCancelModal() {
+                    this.showCancelModal = false;
+                    this.cancelingOrder = null;
+                    this.cancelReason = '';
+                },
+                
+                // 确认取消订单（模拟API调用）
+                confirmCancelOrder() {
+                    if (!this.cancelReason.trim()) {
+                        alert('请输入取消原因');
+                        return;
+                    }
+                    
+                    // 模拟API请求
+                    setTimeout(() => {
+                        // 在实际应用中，这里会调用 POST /api/orders/{id}/cancel
+                        // 请求体：{ "reason": this.cancelReason }
+                        
+                        // 更新订单状态
+                        this.orders = this.orders.map(order => {
+                            if (order.id === this.cancelingOrder.id) {
+                                return { ...order, status: 'cancelled' };
+                            }
+                            return order;
+                        });
+                        
+                        alert(`订单 ${this.cancelingOrder.orderNumber} 已取消`);
+                        this.closeCancelModal();
+                    }, 500);
+                },
+                
+                // 查看订单详情
+                viewOrderDetail(order) {
+                    alert(`查看订单详情: ${order.orderNumber}\n状态: ${this.getStatusText(order.status)}\n金额: ¥${order.totalAmount.toFixed(2)}\n商品数量: ${order.products.length}件`);
+                },
+                
+                // 切换分页
+                changePage(page) {
+                    if (page >= 0 && page < this.totalPages) {
+                        this.currentPage = page;
+                        this.loadOrders();
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

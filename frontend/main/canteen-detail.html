@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>食堂详情 - 校园餐饮系统</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.5;
+        }
+        
+        #app {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* 顶部食堂基本信息横幅 */
+        .canteen-banner {
+            background: linear-gradient(135deg, #1e88e5 0%, #1976d2 100%);
+            color: white;
+            border-radius: 8px;
+            padding: 25px 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.15);
+        }
+        
+        .canteen-name {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .canteen-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .info-icon {
+            font-size: 18px;
+        }
+        
+        /* 主内容区 */
+        .main-content {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        /* 左侧菜单分类导航 */
+        .category-nav {
+            flex: 0 0 220px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .category-title {
+            padding: 0 20px 15px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e88e5;
+            border-bottom: 1px solid #eaeaea;
+            margin-bottom: 15px;
+        }
+        
+        .category-list {
+            list-style: none;
+        }
+        
+        .category-item {
+            padding: 14px 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-left: 4px solid transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .category-item:hover {
+            background-color: #f0f7ff;
+        }
+        
+        .category-item.active {
+            background-color: #e3f2fd;
+            border-left-color: #1e88e5;
+            color: #1e88e5;
+            font-weight: 500;
+        }
+        
+        .food-count {
+            background-color: #e3f2fd;
+            color: #1e88e5;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        /* 右侧菜品网格展示区 */
+        .foods-section {
+            flex: 1;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1e88e5;
+        }
+        
+        .filter-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .search-input {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            width: 200px;
+            font-size: 14px;
+        }
+        
+        .status-select {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: white;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+        }
+        
+        .foods-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .food-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: box-shadow 0.2s;
+        }
+        
+        .food-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .food-image {
+            height: 160px;
+            background-color: #e3f2fd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1e88e5;
+            font-size: 50px;
+        }
+        
+        .food-info {
+            padding: 18px;
+        }
+        
+        .food-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .food-description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        
+        .food-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+        
+        .food-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #e53935;
+        }
+        
+        .shelf-status {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .status-on {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .status-off {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #eaeaea;
+        }
+        
+        .pagination-btn {
+            padding: 8px 16px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .pagination-btn:hover:not(:disabled) {
+            background-color: #f0f7ff;
+            border-color: #1e88e5;
+        }
+        
+        .pagination-btn:disabled {
+            color: #aaa;
+            cursor: not-allowed;
+        }
+        
+        .page-info {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        /* 底部食堂管理员信息 */
+        .admin-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 25px 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid #1e88e5;
+        }
+        
+        .admin-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1e88e5;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .admin-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .admin-item {
+            padding: 15px;
+            background-color: #f8fbff;
+            border-radius: 6px;
+        }
+        
+        .admin-item-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 15px;
+        }
+        
+        .admin-item-value {
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #1e88e5;
+            font-size: 16px;
+        }
+        
+        .error-message {
+            background-color: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border-left: 4px solid #c62828;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .empty-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+            color: #b0bec5;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 900px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .category-nav {
+                flex: none;
+                width: 100%;
+            }
+            
+            .foods-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .canteen-banner {
+                padding: 20px;
+            }
+            
+            .canteen-name {
+                font-size: 24px;
+            }
+            
+            .filter-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-input {
+                width: 100%;
+            }
+            
+            .foods-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .admin-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 顶部食堂基本信息横幅 -->
+        <div class="canteen-banner" v-if="canteenDetail">
+            <div class="canteen-name">{{ canteenDetail.name }}</div>
+            <div>{{ canteenDetail.description }}</div>
+            <div class="canteen-info">
+                <div class="info-item">
+                    <span class="info-icon">📍</span>
+                    <span>{{ canteenDetail.location }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">⏰</span>
+                    <span>营业时间: {{ canteenDetail.openTime }} - {{ canteenDetail.closeTime }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">📞</span>
+                    <span>{{ canteenDetail.contactPhone }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🍽️</span>
+                    <span>容量: {{ canteenDetail.capacity }} 人</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 左侧菜单分类导航 -->
+            <div class="category-nav">
+                <div class="category-title">菜单分类</div>
+                <ul class="category-list">
+                    <li 
+                        class="category-item" 
+                        :class="{ active: selectedCategoryId === 0 }"
+                        @click="selectCategory(0)"
+                    >
+                        <span>全部菜品</span>
+                        <span class="food-count">{{ totalFoods }}</span>
+                    </li>
+                    <li 
+                        v-for="category in categories" 
+                        :key="category.id"
+                        class="category-item"
+                        :class="{ active: selectedCategoryId === category.id }"
+                        @click="selectCategory(category.id)"
+                    >
+                        <span>{{ category.name }}</span>
+                        <span class="food-count">{{ category.foodCount || 0 }}</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- 右侧菜品网格展示区 -->
+            <div class="foods-section">
+                <div class="section-header">
+                    <div class="section-title">菜品列表</div>
+                    <div class="filter-controls">
+                        <input 
+                            type="text" 
+                            class="search-input" 
+                            placeholder="搜索菜品名称..." 
+                            v-model="searchKeyword"
+                            @input="searchFoods"
+                        >
+                        <select class="status-select" v-model="selectedStatus" @change="filterFoods">
+                            <option value="">全部状态</option>
+                            <option value="ON">上架中</option>
+                            <option value="OFF">已下架</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- 加载状态 -->
+                <div class="loading" v-if="loadingFoods">
+                    加载菜品中...
+                </div>
+                
+                <!-- 错误提示 -->
+                <div class="error-message" v-if="foodsError">
+                    {{ foodsError }}
+                </div>
+                
+                <!-- 菜品网格 -->
+                <div class="foods-grid" v-if="!loadingFoods && foods.length > 0">
+                    <div class="food-card" v-for="food in foods" :key="food.id">
+                        <div class="food-image">
+                            🍛
+                        </div>
+                        <div class="food-info">
+                            <div class="food-name">{{ food.name }}</div>
+                            <div class="food-description">{{ food.description }}</div>
+                            <div class="food-footer">
+                                <div class="food-price">¥{{ food.price.toFixed(2) }}</div>
+                                <div class="shelf-status" :class="`status-${food.shelfStatus.toLowerCase()}`">
+                                    {{ food.shelfStatus === 'ON' ? '上架中' : '已下架' }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 空状态 -->
+                <div class="empty-state" v-if="!loadingFoods && foods.length === 0">
+                    <div class="empty-icon">🍽️</div>
+                    <div>暂无菜品数据</div>
+                </div>
+                
+                <!-- 分页 -->
+                <div class="pagination" v-if="!loadingFoods && foods.length > 0">
+                    <button 
+                        class="pagination-btn" 
+                        @click="prevPage" 
+                        :disabled="currentPage === 0"
+                    >
+                        上一页
+                    </button>
+                    <div class="page-info">第 {{ currentPage + 1 }} 页，共 {{ totalPages }} 页</div>
+                    <button 
+                        class="pagination-btn" 
+                        @click="nextPage" 
+                        :disabled="currentPage >= totalPages - 1"
+                    >
+                        下一页
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部食堂管理员信息（仅管理员可见） -->
+        <div class="admin-section" v-if="showAdminInfo && canteenDetail">
+            <div class="admin-title">
+                <span>👨‍💼</span>
+                <span>食堂管理员信息</span>
+            </div>
+            <div class="admin-info">
+                <div class="admin-item">
+                    <div class="admin-item-title">管理员姓名</div>
+                    <div class="admin-item-value">{{ canteenDetail.managerName }}</div>
+                </div>
+                <div class="admin-item">
+                    <div class="admin-item-title">管理员电话</div>
+                    <div class="admin-item-value">{{ canteenDetail.managerPhone }}</div>
+                </div>
+                <div class="admin-item">
+                    <div class="admin-item-title">管理员邮箱</div>
+                    <div class="admin-item-value">{{ canteenDetail.managerEmail }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, computed, onMounted } = Vue;
+        
+        createApp({
+            setup() {
+                // 食堂详情数据
+                const canteenDetail = ref(null);
+                const categories = ref([]);
+                const foods = ref([]);
+                
+                // 加载状态和错误信息
+                const loadingFoods = ref(false);
+                const foodsError = ref('');
+                
+                // 筛选条件
+                const selectedCategoryId = ref(0);
+                const selectedStatus = ref('');
+                const searchKeyword = ref('');
+                
+                // 分页参数
+                const currentPage = ref(0);
+                const pageSize = ref(6);
+                const totalPages = ref(1);
+                const totalFoods = ref(0);
+                
+                // 管理员可见性（模拟管理员登录状态）
+                const showAdminInfo = ref(true);
+                
+                // 模拟获取食堂详情API
+                const fetchCanteenDetail = () => {
+                    // 模拟API响应
+                    canteenDetail.value = {
+                        id: 1,
+                        name: "第一学生食堂",
+                        description: "校园内最大的食堂，提供各类中式美食、西餐和特色小吃",
+                        location: "校园东区教学楼A座旁",
+                        openTime: "06:30",
+                        closeTime: "21:00",
+                        contactPhone: "028-12345678",
+                        capacity: 500,
+                        managerName: "张明",
+                        managerPhone: "13800138000",
+                        managerEmail: "zhangming@campus.edu"
+                    };
+                };
+                
+                // 模拟获取分类列表API
+                const fetchCategories = () => {
+                    // 模拟API响应
+                    categories.value = [
+                        { id: 1, name: "主食类", foodCount: 12 },
+                        { id: 2, name: "炒菜类", foodCount: 18 },
+                        { id: 3, name: "汤羹类", foodCount: 8 },
+                        { id: 4, name: "小吃类", foodCount: 15 },
+                        { id: 5, name: "饮料类", foodCount: 10 },
+                        { id: 6, name: "套餐类", foodCount: 6 }
+                    ];
+                };
+                
+                // 模拟获取菜品列表API
+                const fetchFoods = () => {
+                    loadingFoods.value = true;
+                    foodsError.value = '';
+                    
+                    // 模拟API延迟
+                    setTimeout(() => {
+                        try {
+                            // 模拟菜品数据
+                            const allFoods = [
+                                { id: 1, name: "红烧肉", description: "经典红烧肉，肥而不腻", price: 25.00, shelfStatus: "ON", categoryId: 2 },
+                                { id: 2, name: "鱼香肉丝", description: "川菜经典，酸甜微辣", price: 18.00, shelfStatus: "ON", categoryId: 2 },
+                                { id: 3, name: "宫保鸡丁", description: "鸡肉鲜嫩，花生香脆", price: 20.00, shelfStatus: "ON", categoryId: 2 },
+                                { id: 4, name: "米饭", description: "东北大米，香软可口", price: 2.00, shelfStatus: "ON", categoryId: 1 },
+                                { id: 5, name: "牛肉面", description: "牛肉鲜香，面条劲道", price: 22.00, shelfStatus: "ON", categoryId: 1 },
+                                { id: 6, name: "西红柿鸡蛋汤", description: "家常汤品，营养美味", price: 8.00, shelfStatus: "ON", categoryId: 3 },
+                                { id: 7, name: "炸酱面", description: "传统北京风味", price: 15.00, shelfStatus: "OFF", categoryId: 1 },
+                                { id: 8, name: "麻辣香锅", description: "多种食材，麻辣鲜香", price: 28.00, shelfStatus: "ON", categoryId: 2 },
+                                { id: 9, name: "酸辣粉", description: "酸辣开胃，粉条爽滑", price: 12.00, shelfStatus: "ON", categoryId: 4 },
+                                { id: 10, name: "可乐", description: "冰镇可乐，畅快解渴", price: 4.00, shelfStatus: "ON", categoryId: 5 },
+                                { id: 11, name: "豆浆", description: "现磨豆浆，营养健康", price: 3.00, shelfStatus: "ON", categoryId: 5 },
+                                { id: 12, name: "学生套餐A", description: "一荤一素一汤一米饭", price: 18.00, shelfStatus: "ON", categoryId: 6 }
+                            ];
+                            
+                            // 应用筛选条件
+                            let filteredFoods = [...allFoods];
+                            
+                            // 按分类筛选
+                            if (selectedCategoryId.value > 0) {
+                                filteredFoods = filteredFoods.filter(food => food.categoryId === selectedCategoryId.value);
+                            }
+                            
+                            // 按状态筛选
+                            if (selectedStatus.value) {
+                                filteredFoods = filteredFoods.filter(food => food.shelfStatus === selectedStatus.value);
+                            }
+                            
+                            // 按关键字筛选
+                            if (searchKeyword.value.trim()) {
+                                const keyword = searchKeyword.value.toLowerCase().trim();
+                                filteredFoods = filteredFoods.filter(food => 
+                                    food.name.toLowerCase().includes(keyword) || 
+                                    food.description.toLowerCase().includes(keyword)
+                                );
+                            }
+                            
+                            // 计算分页
+                            totalFoods.value = filteredFoods.length;
+                            totalPages.value = Math.ceil(filteredFoods.length / pageSize.value);
+                            
+                            // 获取当前页数据
+                            const startIndex = currentPage.value * pageSize.value;
+                            const endIndex = startIndex + pageSize.value;
+                            foods.value = filteredFoods.slice(startIndex, endIndex);
+                            
+                        } catch (error) {
+                            foodsError.value = '获取菜品数据失败，请稍后重试';
+                            console.error(error);
+                        } finally {
+                            loadingFoods.value = false;
+                        }
+                    }, 500); // 模拟网络延迟
+                };
+                
+                // 选择分类
+                const selectCategory = (categoryId) => {
+                    selectedCategoryId.value = categoryId;
+                    currentPage.value = 0; // 重置分页
+                    fetchFoods();
+                };
+                
+                // 筛选菜品
+                const filterFoods = () => {
+                    currentPage.value = 0; // 重置分页
+                    fetchFoods();
+                };
+                
+                // 搜索菜品
+                const searchFoods = () => {
+                    // 使用防抖优化搜索体验
+                    clearTimeout(searchFoods.timeout);
+                    searchFoods.timeout = setTimeout(() => {
+                        currentPage.value = 0; // 重置分页
+                        fetchFoods();
+                    }, 300);
+                };
+                
+                // 上一页
+                const prevPage = () => {
+                    if (currentPage.value > 0) {
+                        currentPage.value--;
+                        fetchFoods();
+                    }
+                };
+                
+                // 下一页
+                const nextPage = () => {
+                    if (currentPage.value < totalPages.value - 1) {
+                        currentPage.value++;
+                        fetchFoods();
+                    }
+                };
+                
+                // 初始化数据
+                onMounted(() => {
+                    fetchCanteenDetail();
+                    fetchCategories();
+                    fetchFoods();
+                });
+                
+                return {
+                    canteenDetail,
+                    categories,
+                    foods,
+                    loadingFoods,
+                    foodsError,
+                    selectedCategoryId,
+                    selectedStatus,
+                    searchKeyword,
+                    currentPage,
+                    totalPages,
+                    totalFoods,
+                    showAdminInfo,
+                    selectCategory,
+                    filterFoods,
+                    searchFoods,
+                    prevPage,
+                    nextPage
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
